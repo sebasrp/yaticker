@@ -1,2 +1,6 @@
-setuptools~=57.0.0
-requests>=2.25.1
+# requirements.txt
+#
+# installs dependencies from ./setup.py, and the package itself
+.
+# if you want to do this in editable mode, uncomment the next line instead
+# -e .
