@@ -34,6 +34,7 @@ setup(
     python_requires=">=3.8, <4",
     install_requires=[
         "requests>=2.25.1",
+        "yfinance>=0.1.59",
     ],
     extras_require={
         "dev": ["check-manifest"],

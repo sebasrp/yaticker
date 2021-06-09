@@ -4,12 +4,10 @@
 
 import unittest
 
-from yaticker.yaticker import dummy
-
 
 class TestSimple(unittest.TestCase):
     def test_dummy(self):
-        self.assertEqual(dummy(), "Hello World")
+        self.assertEqual("Hello World", "Hello World")
 
 
 if __name__ == "__main__":
