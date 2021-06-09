@@ -1,13 +1,15 @@
-# the inclusion of the tests module is not meant to offer best practices for
-# testing in general, but rather to support the `find_packages` example in
-# setup.py that excludes installing the "tests" package
-
 import unittest
 
+from yaticker.yaticker import YaTicker
 
-class TestSimple(unittest.TestCase):
-    def test_dummy(self):
-        self.assertEqual("Hello World", "Hello World")
+
+class TestYaticker(unittest.TestCase):
+    def test_init(self):
+        yaticker = YaTicker()
+        self.assertEqual(yaticker.tickers, "AMZN FB GGL")
+        self.assertEqual(yaticker.fiatcurrency, "usd,eur")
+        self.assertEqual(yaticker.period, "7d")
+        self.assertEqual(yaticker.interval, "5m")
 
 
 if __name__ == "__main__":
