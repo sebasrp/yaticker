@@ -2,12 +2,27 @@
 
 Stock and crypto ticker with different clients (console, cli and web)
 
-## Development
+## Prerequisites
 
-Create your own venv to run the program:
+If you run the client on the raspberry with the e-paper hat, you will need to install the required software prior to
+this.
+Follow the instructions on [their wiki](https://www.waveshare.com/wiki/2.7inch_e-Paper_HAT) under the tab "Hardware/Software setup"
+
+## Install & Run
+
+Copy the files from this repository, or clone using:
 ```
-pip install virtualenv            #  install virtualenv if you do not already have it installed
-virtualenv yaticker               # to create a new environment - named yaticker here
-source yaticker/bin/activate      # enter the virtual environment
-pip install -r requirements.txt   # install the requirements in the current environment
+cd ~
+git clone https://github.com/sebasrp/yaticker
+cd yaticker
+```
+
+Install the required modules using pip
+```
+python3 -m pip install -r requirements.txt
+```
+
+Run the script using:
+```
+python3 src/yaticker/cli.py
 ```
