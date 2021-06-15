@@ -1,44 +1,44 @@
-import configparser
-import os
-
 import yfinance as yf
+from bottle import request, route, run
 
 
 class YaTicker(object):
-    def __init__(self, config_file=None):
-        if config_file is None:
-            config_file = YaTicker.create_default_config()
-
-        config = configparser.ConfigParser()
-        config.read(config_file)
-        self.tickers = config["default"]["tickers"]
-        self.fiatcurrency = config["default"]["fiatcurrency"]
-        self.period = config["default"]["period"]
-        self.interval = config["default"]["interval"]
+    def __init__(self):
         return
 
     @staticmethod
     def get_tickers_data(
         tickers_string: str = "AMZN", period: str = "7d", interval: str = "5m"
     ):
-        """Return the tickers data."""
+        """Return the list of tickers data."""
         data = yf.download(
             tickers=tickers_string, period=period, interval=interval, group_by="ticker"
         )
         return data
 
     @staticmethod
-    def create_default_config():
-        config = configparser.ConfigParser()
-        config["default"] = {
-            "tickers": "AMZN FB GGL",
-            "fiatcurrency": "usd,eur",
-            "period": "7d",
-            "interval": "5m",
-        }
-        file_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "config.ini"
-        )
-        with open(file_path, "w") as configfile:
-            config.write(configfile)
-        return file_path
+    def get_ticker_data(ticker: str = "AMZN", period: str = "1h", interval: str = "1m"):
+        """Return the ticker data."""
+        ticker_data = yf.Ticker(ticker)
+        data = ticker_data.history(period=period, interval=interval)
+        return data
+
+    @route("/ticker/<symbol>")
+    def ticker(symbol="amzn"):
+        period = request.query.get("period", default="1h")
+        interval = request.query.get("interval", default="1m")
+        data = YaTicker.get_ticker_data(ticker=symbol, interval=interval, period=period)
+        data_json = data.to_json(orient="index")
+        return data_json
+
+    def run(self):
+        run(host="localhost", port=8080, debug=True)
+
+
+def main():
+    yaticker = YaTicker()
+    yaticker.run()
+
+
+if __name__ == "__main__":
+    main()
