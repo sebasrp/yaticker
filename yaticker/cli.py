@@ -1,6 +1,6 @@
 import click
 
-from yaticker import YaTicker
+from yaticker.yaticker import YaTicker
 
 
 @click.command()

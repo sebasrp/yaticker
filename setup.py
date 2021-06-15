@@ -29,15 +29,15 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     keywords="web-app terminal-app finance stocks crypto ticker",
-    package_dir={"": "src"},
-    packages=find_packages(where="src"),
+    package_dir={"": "yaticker"},
+    packages=find_packages(where="yaticker"),
     python_requires=">=3.8, <4",
     install_requires=["requests>=2.25.1", "yfinance>=0.1.59", "bottle>=0.12.19"],
     extras_require={
         "dev": ["check-manifest"],
         "test": ["coverage"],
     },
-    entry_points={"console_scripts": ["yaticker=yaticker:main"]},
+    entry_points={"console_scripts": ["yaticker=cli:main"]},
     project_urls={
         "Bug Reports": "https://github.com/sebasrp/yaticker/issues",
         "Source": "https://github.com/sebasrp/yaticker",
