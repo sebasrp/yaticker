@@ -13,4 +13,10 @@ include setup.py
 recursive-include data *
 
 # include the requirements file
-include requirements.txt
+include requirements .txt
+
+# added by check-manifest
+recursive-include yaticker *.py
+
+# added by check-manifest
+include *.txt

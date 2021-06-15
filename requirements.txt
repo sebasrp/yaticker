@@ -1,6 +1,6 @@
 requests~=2.25.1
-yaticker~=0.1
 setuptools~=57.0.0
 yfinance ~=0.1.59
 click~=8.0.1
 bottle~=0.12.19
+RPi~=0.0.1
