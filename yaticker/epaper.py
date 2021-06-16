@@ -3,10 +3,38 @@ import textwrap
 import time
 
 from PIL import Image, ImageOps, ImageFont, ImageDraw
-import RPi.GPIO as GPIO
 from waveshare_epd import epd2in7
+import RPi.GPIO as GPIO
 
 EPD = epd2in7.EPD()
+KEY_1 = 5
+KEY_2 = 6
+KEY_3 = 13
+KEY_4 = 19
+
+
+def initialize_keys():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(KEY_1, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(KEY_2, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(KEY_3, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(KEY_4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+
+def btn_1_press():
+    display_message("Key 1 pressed")
+
+
+def btn_2_press():
+    display_message("Key 2 pressed")
+
+
+def btn_3_press():
+    display_message("Key 3 pressed")
+
+
+def btn_4_press():
+    display_message("Key 4 pressed")
 
 
 def empty_image(orientation="horizontal"):
@@ -26,6 +54,7 @@ def display_image(img):
     epd.Init_4Gray()
     epd.display_4Gray(epd.getbuffer_4Gray(img))
     epd.sleep()
+    initialize_keys()
     return
 
 
@@ -54,17 +83,19 @@ def write_wrapped_lines(img, text, font_size=16, y_text=20, height=15, width=25,
 
 
 def display_message(message):
-    image = empty_image()
-    draw = ImageDraw.Draw(image)
-    draw.text((95, 15), str(time.strftime("%-H:%M %p, %-d %b %Y")), fill=0)
-    write_wrapped_lines(image, "Issue:" + message)
-    return image
+    try:
+        image = empty_image()
+        draw = ImageDraw.Draw(image)
+        draw.text((95, 15), str(time.strftime("%-H:%M %p, %-d %b %Y")), fill=0)
+        write_wrapped_lines(image, "Issue:" + message)
+        display_image(image)
+    except Exception as e:
+        logging.info(f"Exception: {e}")
 
 
 def full_screen_update():
     try:
-        image = display_message("Hello World")
-        display_image(image)
+        display_message("Welcome to Yaticker")
     except Exception as e:
         logging.info(f"Exception: {e}")
     return time.time()
@@ -74,12 +105,37 @@ def display_info():
     full_screen_update()
 
 
+def needs_refresh():
+    return False
+
+
 def main():
     logging.basicConfig(level=logging.DEBUG)
     try:
         display_info()
+        initialize_keys()
+        while True:
+            key_1_state = GPIO.input(KEY_1)
+            key_2_state = GPIO.input(KEY_2)
+            key_3_state = GPIO.input(KEY_3)
+            key_4_state = GPIO.input(KEY_4)
+
+            if not key_1_state:
+                btn_1_press()
+                time.sleep(0.2)
+            if not key_2_state:
+                btn_2_press()
+                time.sleep(0.2)
+            if not key_3_state:
+                btn_3_press()
+                time.sleep(0.2)
+            if not key_4_state:
+                btn_4_press()
+                time.sleep(0.2)
     except Exception as e:
-        logging.info(f"Exception: {e}")
+        logging.error(e, exc_info=True)
+    except KeyboardInterrupt:
+        logging.info("ctrl + c:")
         epd2in7.epdconfig.module_exit()
         GPIO.cleanup()
         exit()
