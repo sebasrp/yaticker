@@ -19,7 +19,13 @@ cd yaticker
 
 Install the required modules using pip
 ```
+(optional but recommended) Use a virtual environment for this
+pip install virtualenv (if you do not have it installed)
+virtualenv venv
+source venv/bin/activate
 python3 -m pip install -r requirements.txt
+pip install -e "git+https://github.com/waveshare/e-Paper.git#egg=waveshare_epd&subdirectory=RaspberryPi_JetsonNano/python"
+
 ```
 
 Run the script using:
