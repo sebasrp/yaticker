@@ -17,7 +17,7 @@ class YaTicker(object):
         return data
 
     @staticmethod
-    def get_ticker_data(ticker: str = "AMZN", period: str = "1h", interval: str = "1m"):
+    def get_ticker_data(ticker: str = "AMZN", period: str = "1d", interval: str = "1m"):
         """Return the ticker data."""
         ticker_data = yf.Ticker(ticker)
         data = ticker_data.history(period=period, interval=interval)
@@ -25,7 +25,7 @@ class YaTicker(object):
 
     @route("/ticker/<symbol>")
     def ticker(symbol="amzn"):
-        period = request.query.get("period", default="1h")
+        period = request.query.get("period", default="1d")
         interval = request.query.get("interval", default="1m")
         data = YaTicker.get_ticker_data(ticker=symbol, interval=interval, period=period)
         data_json = data.to_json(orient="index")

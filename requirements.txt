@@ -4,3 +4,5 @@ yfinance ~=0.1.59
 click~=8.0.1
 bottle~=0.12.19
 RPi~=0.0.1
+mplfinance~=0.12.7a17
+Pillow~=8.2.0
