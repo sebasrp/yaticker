@@ -6,10 +6,10 @@ import currency
 import mplfinance as mplf
 import RPi.GPIO as GPIO
 from PIL import Image, ImageDraw, ImageFont
+from util import util
 from waveshare_epd import epd2in7
 
 from yaticker import yaticker
-from util import util
 
 EPD = epd2in7.EPD()
 eHEIGHT = EPD.height
@@ -69,7 +69,8 @@ def display_image(img):
 
 
 def _place_text(
-    img, text, x_offset=0, y_offset=0, font_size=40, font_name="Forum-Regular", fill=0):
+    img, text, x_offset=0, y_offset=0, font_size=40, font_name="Forum-Regular", fill=0
+):
     """
     Put some text at a location on the image.
     """
@@ -79,25 +80,36 @@ def _place_text(
 
 
 def _place_centered_text(
-    img, text, x_offset=0, y_offset=0, font_size=40, font_name="Forum-Regular", fill=0):
+    img, text, x_offset=0, y_offset=0, font_size=40, font_name="Forum-Regular", fill=0
+):
     """
     Put some centered text at a location on the image.
     """
-    draw = ImageDraw.Draw(img)
     font = ImageFont.truetype("/usr/share/fonts/TTF/DejaVuSans.ttf", font_size)
     img_width, img_height = img.size
     text_width, _ = font.getsize(text)
     text_height = font_size
     draw_x = (img_width - text_width) // 2 + x_offset
     draw_y = (img_height - text_height) // 2 + y_offset
-    draw.text((draw_x, draw_y), text, font=font, fill=fill)
+    _place_text(img, text, draw_x, draw_y, font_size, font_name, fill)
 
 
-def _stock_graph(data, height=116, width=206, filename='candle.png'):
+def _place_text_right(
+    img, text, x_offset=0, y_offset=0, font_size=40, font_name="Forum-Regular", fill=0
+):
+    font = ImageFont.truetype("/usr/share/fonts/TTF/DejaVuSans.ttf", font_size)
+    img_width, img_height = img.size
+    text_width, _ = font.getsize(text)
+    draw_x = (img_width - text_width) + x_offset
+    draw_y = y_offset
+    _place_text(img, text, draw_x, draw_y, font_size, font_name, fill)
+
+
+def _stock_graph(data, height=116, width=206, filename="candle.png"):
     fig, _ = mplf.plot(
         data,
-        type="candle",
-        figsize=(width / eDPI,  height / eDPI),
+        type="line",
+        figsize=(width / eDPI, height / eDPI),
         axisoff=True,
         tight_layout=True,
         returnfig=True,
@@ -129,36 +141,58 @@ def display_message(message):
         logging.info(f"Exception: {e}")
 
 
-def display_stock(stock="amzn"):
+def display_stock(stock="amzn", period: str = "1440m", interval: str = "5m"):
     """
     Displays the stock data, the stock last price (at the desired coin/fiat)
-    :param stock:
+    :param stock: symbol of the stock to display
+    :param period: time period to display
+    :param interval: granularity of the data
     :return:
     """
-    data = yaticker.YaTicker.get_ticker_data(stock)
+    stock_info = yaticker.YaTicker.get_ticker_info(stock)
+    data = yaticker.YaTicker.get_ticker_data(
+        ticker=stock, period=period, interval=interval
+    )
 
     # we clear the image first
     image = empty_image()
-    draw = ImageDraw.Draw(image)
+    ImageDraw.Draw(image)
 
     # we draw the stock graph
     stock_image = Image.open(_stock_graph(data))
     image.paste(stock_image, (60, 0))
 
-    # we draw the latest stock's closing price
-    last_closing = data['Close'][-1]
-    closing_str = f"{currency.symbol('USD')}{util.number_to_string(last_closing)}"
+    # we draw the latest stock's price
+    latest_price = data["Close"][-1]
+    closing_str = f"{currency.symbol('USD')}{util.number_to_string(latest_price)}"
     font_size = 48
     y_offset = ((eWIDTH - font_size) / 2) - 12
-    write_wrapped_lines(
+    x_offset = -29
+    _place_centered_text(
         img=image,
         text=closing_str,
         font_size=font_size,
-        y_text=y_offset,
-        height=8,
-        width=10,
-        font_name="Roboto-Medium"
+        x_offset=x_offset,
+        y_offset=y_offset,
+        font_name="Roboto-Medium",
     )
+
+    # we add the diff vs last trading window
+    previous_close = stock_info.get("previousClose")
+    if previous_close is not None:
+        delta_str = f"{(latest_price - previous_close):+.2g}"
+        delta_percent = util.get_percentage_diff(latest_price, previous_close)
+        diff_str = f"{delta_str} ({delta_percent:+.2f}%)"
+
+        font_size = 10
+        y_offset = eWIDTH - 48
+        _place_text_right(
+            img=image,
+            text=diff_str,
+            font_size=font_size,
+            y_offset=y_offset,
+            font_name="Roboto-Medium",
+        )
 
     # we put the stock name on top left
     _place_text(img=image, text=stock.upper(), font_size=20)
@@ -166,15 +200,13 @@ def display_stock(stock="amzn"):
     # date of last ticker data at the bottom
     last_update = str(time.strftime("%-H:%M %p, %-d %b %Y"))
     font_size = 10
-    y_offset = ((eWIDTH - font_size) / 2)
+    y_offset = (eWIDTH - font_size) / 2
     _place_centered_text(
         img=image,
         text=last_update,
         font_size=font_size,
         y_offset=y_offset,
-        #height=10,
-        #width=eWIDTH,
-        font_name="Roboto-Medium"
+        font_name="Roboto-Medium",
     )
 
     # we display the final image

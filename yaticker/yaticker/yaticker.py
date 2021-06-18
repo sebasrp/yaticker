@@ -17,13 +17,15 @@ class YaTicker(object):
         return data
 
     @staticmethod
-    def get_ticker_info(ticker: str = 'AMZN') -> dict:
+    def get_ticker_info(ticker: str = "AMZN") -> dict:
         """Returns the ticker info"""
         ticker = yf.Ticker(ticker)
         return ticker.info
 
     @staticmethod
-    def get_ticker_data(ticker: str = "AMZN", period: str = "1d", interval: str = "1m"):
+    def get_ticker_data(
+        ticker: str = "AMZN", period: str = "1440m", interval: str = "1m"
+    ):
         """Return the ticker data."""
         ticker_data = yf.Ticker(ticker)
         data = ticker_data.history(period=period, interval=interval)

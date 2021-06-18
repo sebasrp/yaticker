@@ -20,5 +20,14 @@ def number_to_string(number):
     if number > 1000:
         number_string = format(int(number), ",")
     else:
-        number_string = str(float('%.5g' % number))
+        number_string = str(float("%.5g" % number))
     return number_string
+
+
+def get_percentage_diff(current, previous):
+    if current == previous:
+        return 0
+    try:
+        return (float(current - previous) / previous) * 100.0
+    except ZeroDivisionError:
+        return float("inf")
