@@ -1,6 +1,7 @@
 import logging
 import textwrap
 import time
+from datetime import datetime
 
 import currency
 import mplfinance as mplf
@@ -198,12 +199,14 @@ def display_stock(stock="amzn", period: str = "1440m", interval: str = "5m"):
     _place_text(img=image, text=stock.upper(), font_size=20)
 
     # date of last ticker data at the bottom
-    last_update = str(time.strftime("%-H:%M %p, %-d %b %Y"))
+    last_data_time = data.index[-1].tz_convert('Asia/Singapore').strftime("%-H:%M %p, %-d %b %Y")
+    logging.debug(last_data_time)
+
     font_size = 10
     y_offset = (eWIDTH - font_size) / 2
     _place_centered_text(
         img=image,
-        text=last_update,
+        text=last_data_time,
         font_size=font_size,
         y_offset=y_offset,
         font_name="Roboto-Medium",
