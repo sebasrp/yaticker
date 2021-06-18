@@ -2,18 +2,21 @@ import logging
 import textwrap
 import time
 
+import currency
 import mplfinance as mplf
 import RPi.GPIO as GPIO
 from PIL import Image, ImageDraw, ImageFont
 from waveshare_epd import epd2in7
 
 from yaticker import yaticker
+from util import util
 
 EPD = epd2in7.EPD()
 eHEIGHT = EPD.height
 eWIDTH = EPD.width
 eDPI = 117
 
+# PIN numbers of the physical buttons
 KEY_1 = 5
 KEY_2 = 6
 KEY_3 = 13
@@ -66,8 +69,17 @@ def display_image(img):
 
 
 def _place_text(
-    img, text, x_offset=0, y_offset=0, font_size=40, font_name="Forum-Regular", fill=0
-):
+    img, text, x_offset=0, y_offset=0, font_size=40, font_name="Forum-Regular", fill=0):
+    """
+    Put some text at a location on the image.
+    """
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("/usr/share/fonts/TTF/DejaVuSans.ttf", font_size)
+    draw.text((x_offset, y_offset), text, font=font, fill=fill)
+
+
+def _place_centered_text(
+    img, text, x_offset=0, y_offset=0, font_size=40, font_name="Forum-Regular", fill=0):
     """
     Put some centered text at a location on the image.
     """
@@ -81,13 +93,26 @@ def _place_text(
     draw.text((draw_x, draw_y), text, font=font, fill=fill)
 
 
+def _stock_graph(data, height=116, width=206, filename='candle.png'):
+    fig, _ = mplf.plot(
+        data,
+        type="candle",
+        figsize=(width / eDPI,  height / eDPI),
+        axisoff=True,
+        tight_layout=True,
+        returnfig=True,
+    )
+    fig.savefig(filename, dpi=eDPI)
+    return filename
+
+
 def write_wrapped_lines(
     img, text, font_size=16, y_text=20, height=15, width=25, font_name="Roboto-Light"
 ):
     lines = textwrap.wrap(text, width)
     num_lines = 0
     for line in lines:
-        _place_text(img, line, 0, y_text, font_size, font_name)
+        _place_centered_text(img, line, 0, y_text, font_size, font_name)
         y_text += height
         num_lines += 1
     return img
@@ -105,18 +130,55 @@ def display_message(message):
 
 
 def display_stock(stock="amzn"):
+    """
+    Displays the stock data, the stock last price (at the desired coin/fiat)
+    :param stock:
+    :return:
+    """
     data = yaticker.YaTicker.get_ticker_data(stock)
-    fig, _ = mplf.plot(
-        data,
-        type="candle",
-        volume=True,
-        figsize=(eHEIGHT / eDPI, eWIDTH / eDPI),
-        axisoff=True,
-        tight_layout=True,
-        returnfig=True,
+
+    # we clear the image first
+    image = empty_image()
+    draw = ImageDraw.Draw(image)
+
+    # we draw the stock graph
+    stock_image = Image.open(_stock_graph(data))
+    image.paste(stock_image, (60, 0))
+
+    # we draw the latest stock's closing price
+    last_closing = data['Close'][-1]
+    closing_str = f"{currency.symbol('USD')}{util.number_to_string(last_closing)}"
+    font_size = 48
+    y_offset = ((eWIDTH - font_size) / 2) - 12
+    write_wrapped_lines(
+        img=image,
+        text=closing_str,
+        font_size=font_size,
+        y_text=y_offset,
+        height=8,
+        width=10,
+        font_name="Roboto-Medium"
     )
-    fig.savefig("candle.png", dpi=eDPI)
-    display_image(Image.open("candle.png"))
+
+    # we put the stock name on top left
+    _place_text(img=image, text=stock.upper(), font_size=20)
+
+    # date of last ticker data at the bottom
+    last_update = str(time.strftime("%-H:%M %p, %-d %b %Y"))
+    font_size = 10
+    y_offset = ((eWIDTH - font_size) / 2)
+    _place_centered_text(
+        img=image,
+        text=last_update,
+        font_size=font_size,
+        y_offset=y_offset,
+        #height=10,
+        #width=eWIDTH,
+        font_name="Roboto-Medium"
+    )
+
+    # we display the final image
+    display_image(image)
 
 
 def full_screen_update():
