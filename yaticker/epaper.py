@@ -107,16 +107,21 @@ def _place_text_right(
 
 
 def _stock_graph(data, height=116, width=264, filename="candle.png"):
-    fig, _ = mplf.plot(
+    custom_rc = {'font.size': 6, 'lines.linewidth': 1}
+    save = dict(fname=filename, dpi=eDPI)
+    style = mplf.make_mpf_style(base_mpf_style='classic', rc=custom_rc)
+
+    mplf.plot(
         data,
-        type="line",
+        volume=True,
+        type="candle",
+        style=style,
         figsize=(width / eDPI, height / eDPI),
         axisoff=True,
         tight_layout=True,
         scale_padding=0.2,
-        returnfig=True,
+        savefig=save,
     )
-    fig.savefig(filename, dpi=eDPI)
     return filename
 
 
@@ -143,7 +148,7 @@ def display_message(message):
         logging.info(f"Exception: {e}")
 
 
-def display_stock(stock="amzn", period: str = "1440m", interval: str = "5m"):
+def display_stock(stock="amc", period: str = "5d", interval: str = "1h"):
     """
     Displays the stock data, the stock last price (at the desired coin/fiat)
     :param stock: symbol of the stock to display
