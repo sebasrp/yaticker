@@ -113,6 +113,7 @@ def _stock_graph(data, height=116, width=206, filename="candle.png"):
         figsize=(width / eDPI, height / eDPI),
         axisoff=True,
         tight_layout=True,
+        scale_padding=0.2,
         returnfig=True,
     )
     fig.savefig(filename, dpi=eDPI)
@@ -200,7 +201,6 @@ def display_stock(stock="amzn", period: str = "1440m", interval: str = "5m"):
 
     # date of last ticker data at the bottom
     last_data_time = data.index[-1].tz_convert('Asia/Singapore').strftime("%-H:%M %p, %-d %b %Y")
-    logging.debug(last_data_time)
 
     font_size = 10
     y_offset = (eWIDTH - font_size) / 2
