@@ -106,7 +106,7 @@ def _place_text_right(
     _place_text(img, text, draw_x, draw_y, font_size, font_name, fill)
 
 
-def _stock_graph(data, height=116, width=206, filename="candle.png"):
+def _stock_graph(data, height=116, width=264, filename="candle.png"):
     fig, _ = mplf.plot(
         data,
         type="line",
@@ -162,19 +162,30 @@ def display_stock(stock="amzn", period: str = "1440m", interval: str = "5m"):
 
     # we draw the stock graph
     stock_image = Image.open(_stock_graph(data))
-    image.paste(stock_image, (60, 0))
+    image.paste(stock_image, (0, 0))
 
     # we draw the latest stock's price
     latest_price = data["Close"][-1]
     closing_str = f"{currency.symbol('USD')}{util.number_to_string(latest_price)}"
-    font_size = 48
-    y_offset = ((eWIDTH - font_size) / 2) - 12
+    stock_price_font_size = 48
+    y_offset = ((eWIDTH - stock_price_font_size) / 2) - 12
     x_offset = -29
     _place_centered_text(
         img=image,
         text=closing_str,
-        font_size=font_size,
+        font_size=stock_price_font_size,
         x_offset=x_offset,
+        y_offset=y_offset,
+        font_name="Roboto-Medium",
+    )
+
+    # we put the stock name at the bottom right of the graph
+    symbol_font_size = 20
+    y_offset = eWIDTH - stock_price_font_size
+    _place_text_right(
+        img=image,
+        text=stock.upper(),
+        font_size=symbol_font_size,
         y_offset=y_offset,
         font_name="Roboto-Medium",
     )
@@ -186,28 +197,25 @@ def display_stock(stock="amzn", period: str = "1440m", interval: str = "5m"):
         delta_percent = util.get_percentage_diff(latest_price, previous_close)
         diff_str = f"{delta_str} ({delta_percent:+.2f}%)"
 
-        font_size = 10
-        y_offset = eWIDTH - 48
+        diff_font_size = 10
+        y_offset = eWIDTH - stock_price_font_size + symbol_font_size
         _place_text_right(
             img=image,
             text=diff_str,
-            font_size=font_size,
+            font_size=diff_font_size,
             y_offset=y_offset,
             font_name="Roboto-Medium",
         )
 
-    # we put the stock name on top left
-    _place_text(img=image, text=stock.upper(), font_size=20)
-
     # date of last ticker data at the bottom
     last_data_time = data.index[-1].tz_convert('Asia/Singapore').strftime("%-H:%M %p, %-d %b %Y")
 
-    font_size = 10
-    y_offset = (eWIDTH - font_size) / 2
+    last_date_font_size = 10
+    y_offset = (eWIDTH - last_date_font_size) / 2
     _place_centered_text(
         img=image,
         text=last_data_time,
-        font_size=font_size,
+        font_size=last_date_font_size,
         y_offset=y_offset,
         font_name="Roboto-Medium",
     )
