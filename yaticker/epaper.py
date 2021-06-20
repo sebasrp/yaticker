@@ -1,7 +1,6 @@
 import logging
 import textwrap
 import time
-from datetime import datetime
 
 import currency
 import mplfinance as mplf
@@ -106,22 +105,43 @@ def _place_text_right(
     _place_text(img, text, draw_x, draw_y, font_size, font_name, fill)
 
 
-def _stock_graph(data, height=116, width=264, filename="candle.png"):
-    custom_rc = {'font.size': 6, 'lines.linewidth': 1}
-    save = dict(fname=filename, dpi=eDPI)
-    style = mplf.make_mpf_style(base_mpf_style='classic', rc=custom_rc)
-
-    mplf.plot(
-        data,
-        volume=True,
-        type="candle",
-        style=style,
-        figsize=(width / eDPI, height / eDPI),
-        axisoff=True,
-        tight_layout=True,
-        scale_padding=0.2,
-        savefig=save,
+def _stock_graph(data, height=116, width=264, dpi=117, filename="candle.png"):
+    fig_size = (width / dpi, height / dpi)
+    custom_rc = {
+        "font.size": 8,
+        # This removes the frames from the axes
+        "axes.spines.left": False,
+        "axes.spines.right": False,
+        "axes.spines.top": False,
+        "axes.spines.bottom": False,
+        # lets try to have the size behave
+        "figure.figsize": fig_size,
+        "axes.xmargin": 0,
+        "axes.ymargin": 0,
+    }
+    style_settings = mplf.make_mpf_style(
+        base_mpf_style="binance",
+        rc=custom_rc,
+        gridstyle="",
     )
+
+    fig, _ = mplf.plot(
+        data,
+        figsize=fig_size,
+        type="line",
+        style=style_settings,
+        tight_layout=True,
+        # we make the lines thinner -  see # https://github.com/matplotlib/mplfinance/blob/master/examples/widths.ipynb
+        update_width_config=dict(line_width=1),
+        # let's rotate the dates so that they are not angled
+        xrotation=0,
+        datetime_format="%H:%M",
+        ylabel="",
+        scale_padding=0.2,
+        returnfig=True,
+    )
+    util.set_size(fig, fig_size)
+    fig.savefig(fname=filename, dpi=dpi, bbox_inches="tight")
     return filename
 
 
@@ -213,7 +233,9 @@ def display_stock(stock="amc", period: str = "5d", interval: str = "1h"):
         )
 
     # date of last ticker data at the bottom
-    last_data_time = data.index[-1].tz_convert('Asia/Singapore').strftime("%-H:%M %p, %-d %b %Y")
+    last_data_time = (
+        data.index[-1].tz_convert("Asia/Singapore").strftime("%-H:%M %p, %-d %b %Y")
+    )
 
     last_date_font_size = 10
     y_offset = (eWIDTH - last_date_font_size) / 2

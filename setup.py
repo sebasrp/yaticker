@@ -32,7 +32,16 @@ setup(
     package_dir={"": "yaticker"},
     packages=find_packages(where="yaticker"),
     python_requires=">=3.8, <4",
-    install_requires=["requests>=2.25.1", "yfinance>=0.1.59", "bottle>=0.12.19"],
+    install_requires=[
+        "requests>=2.25.1",
+        "yfinance>=0.1.59",
+        "click~=8.0.1",
+        "bottle>=0.12.19",
+        "mplfinance~=0.12.7a17",
+        "Pillow~=8.2.0",
+        "nh-currency~=1.0.1",
+        "matplotlib~=3.4.2",
+    ],
     extras_require={
         "dev": ["check-manifest"],
         "test": ["coverage"],
