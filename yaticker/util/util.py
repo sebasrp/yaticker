@@ -1,7 +1,9 @@
+import textwrap
 from tempfile import NamedTemporaryFile
 
 import requests
 from matplotlib.image import imread
+from PIL import Image, ImageDraw, ImageFont
 
 
 def is_connected(url="http://www.google.com/", timeout=3):
@@ -62,3 +64,88 @@ def set_size(fig, size, dpi=100, eps=1e-2, give_up=2, min_size_px=10):
             return False
         if set_width * dpi < min_size_px or set_height * dpi < min_size_px:
             return False
+
+
+def empty_image(width, height, orientation="horizontal"):
+    """
+    Returns an empty canvas/image to draw  on
+    :return:
+    """
+    if orientation == "vertical":
+        image = Image.new("1", (width, height), 255)  # 255: clear the frame
+    else:
+        image = Image.new("1", (height, width), 255)  # 255: clear the frame
+    return image
+
+
+def place_text(
+    img,
+    text,
+    x_offset=0,
+    y_offset=0,
+    font_size=40,
+    font_name="Forum-Regular",
+    fill=0,
+):
+    """
+    Put some text at a location on the image.
+    """
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("/usr/share/fonts/TTF/DejaVuSans.ttf", font_size)
+    draw.text((x_offset, y_offset), text, font=font, fill=fill)
+
+
+def place_centered_text(
+    img,
+    text,
+    x_offset=0,
+    y_offset=0,
+    font_size=40,
+    font_name="Forum-Regular",
+    fill=0,
+):
+    """
+    Put some centered text at a location on the image.
+    """
+    font = ImageFont.truetype("/usr/share/fonts/TTF/DejaVuSans.ttf", font_size)
+    img_width, img_height = img.size
+    text_width, _ = font.getsize(text)
+    text_height = font_size
+    draw_x = (img_width - text_width) // 2 + x_offset
+    draw_y = (img_height - text_height) // 2 + y_offset
+    place_text(img, text, draw_x, draw_y, font_size, font_name, fill)
+
+
+def place_text_right(
+    img,
+    text,
+    x_offset=0,
+    y_offset=0,
+    font_size=40,
+    font_name="Forum-Regular",
+    fill=0,
+):
+    font = ImageFont.truetype("/usr/share/fonts/TTF/DejaVuSans.ttf", font_size)
+    img_width, img_height = img.size
+    text_width, _ = font.getsize(text)
+    draw_x = (img_width - text_width) + x_offset
+    draw_y = y_offset
+    place_text(img, text, draw_x, draw_y, font_size, font_name, fill)
+
+
+def write_wrapped_lines(
+    img,
+    text,
+    font_size=16,
+    y_text=20,
+    height=15,
+    width=25,
+    font_name="Roboto-Light",
+):
+    lines = textwrap.wrap(text, width)
+    num_lines = 0
+    for line in lines:
+        place_centered_text(img, line, 0, y_text, font_size, font_name)
+        y_text += height
+        num_lines += 1
+    return img

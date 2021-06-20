@@ -1,11 +1,10 @@
 import logging
-import textwrap
 import time
 from abc import ABC, abstractmethod
 
 import currency
 import mplfinance as mplf
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 from util import util
 
 from yaticker import yaticker
@@ -34,100 +33,12 @@ class Dashboard(ABC):
     def display_image(self, img):
         pass
 
-    def empty_image(self, orientation="horizontal"):
-        """
-        Returns an empty canvas/image to draw  on
-        :return:
-        """
-        if orientation == "vertical":
-            image = Image.new(
-                "1", (self.width, self.height), 255
-            )  # 255: clear the frame
-        else:
-            image = Image.new(
-                "1", (self.height, self.width), 255
-            )  # 255: clear the frame
-        return image
-
-    @staticmethod
-    def place_text(
-        img,
-        text,
-        x_offset=0,
-        y_offset=0,
-        font_size=40,
-        font_name="Forum-Regular",
-        fill=0,
-    ):
-        """
-        Put some text at a location on the image.
-        """
-        draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype("/usr/share/fonts/TTF/DejaVuSans.ttf", font_size)
-        draw.text((x_offset, y_offset), text, font=font, fill=fill)
-
-    @staticmethod
-    def place_centered_text(
-        img,
-        text,
-        x_offset=0,
-        y_offset=0,
-        font_size=40,
-        font_name="Forum-Regular",
-        fill=0,
-    ):
-        """
-        Put some centered text at a location on the image.
-        """
-        font = ImageFont.truetype("/usr/share/fonts/TTF/DejaVuSans.ttf", font_size)
-        img_width, img_height = img.size
-        text_width, _ = font.getsize(text)
-        text_height = font_size
-        draw_x = (img_width - text_width) // 2 + x_offset
-        draw_y = (img_height - text_height) // 2 + y_offset
-        Dashboard.place_text(img, text, draw_x, draw_y, font_size, font_name, fill)
-
-    @staticmethod
-    def place_text_right(
-        img,
-        text,
-        x_offset=0,
-        y_offset=0,
-        font_size=40,
-        font_name="Forum-Regular",
-        fill=0,
-    ):
-        font = ImageFont.truetype("/usr/share/fonts/TTF/DejaVuSans.ttf", font_size)
-        img_width, img_height = img.size
-        text_width, _ = font.getsize(text)
-        draw_x = (img_width - text_width) + x_offset
-        draw_y = y_offset
-        Dashboard.place_text(img, text, draw_x, draw_y, font_size, font_name, fill)
-
-    @staticmethod
-    def write_wrapped_lines(
-        img,
-        text,
-        font_size=16,
-        y_text=20,
-        height=15,
-        width=25,
-        font_name="Roboto-Light",
-    ):
-        lines = textwrap.wrap(text, width)
-        num_lines = 0
-        for line in lines:
-            Dashboard.place_centered_text(img, line, 0, y_text, font_size, font_name)
-            y_text += height
-            num_lines += 1
-        return img
-
     def display_message(self, message):
         try:
-            image = self.empty_image()
+            image = util.empty_image(width=self.width, height=self.height)
             draw = ImageDraw.Draw(image)
             draw.text((95, 15), str(time.strftime("%-H:%M %p, %-d %b %Y")), fill=0)
-            Dashboard.write_wrapped_lines(image, message)
+            util.write_wrapped_lines(image, message)
             self.display_image(image)
         except Exception as e:
             logging.info(f"Exception: {e}")
@@ -187,7 +98,7 @@ class Dashboard(ABC):
         )
 
         # we clear the image first
-        image = self.empty_image()
+        image = util.empty_image(width=self.width, height=self.height)
         ImageDraw.Draw(image)
 
         # we draw the stock graph
@@ -200,7 +111,7 @@ class Dashboard(ABC):
         stock_price_font_size = 48
         y_offset = ((self.width - stock_price_font_size) / 2) - 12
         x_offset = -29
-        Dashboard.place_centered_text(
+        util.place_centered_text(
             img=image,
             text=closing_str,
             font_size=stock_price_font_size,
@@ -212,7 +123,7 @@ class Dashboard(ABC):
         # we put the stock name at the bottom right of the graph
         symbol_font_size = 20
         y_offset = self.width - stock_price_font_size
-        Dashboard.place_text_right(
+        util.place_text_right(
             img=image,
             text=stock.upper(),
             font_size=symbol_font_size,
@@ -229,7 +140,7 @@ class Dashboard(ABC):
 
             diff_font_size = 10
             y_offset = self.width - stock_price_font_size + symbol_font_size
-            Dashboard.place_text_right(
+            util.place_text_right(
                 img=image,
                 text=diff_str,
                 font_size=diff_font_size,
@@ -244,7 +155,7 @@ class Dashboard(ABC):
 
         last_date_font_size = 10
         y_offset = (self.width - last_date_font_size) / 2
-        Dashboard.place_centered_text(
+        util.place_centered_text(
             img=image,
             text=last_data_time,
             font_size=last_date_font_size,
