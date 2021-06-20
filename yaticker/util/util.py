@@ -66,16 +66,12 @@ def set_size(fig, size, dpi=100, eps=1e-2, give_up=2, min_size_px=10):
             return False
 
 
-def empty_image(width, height, orientation="horizontal"):
+def empty_image(width, height):
     """
     Returns an empty canvas/image to draw  on
     :return:
     """
-    if orientation == "vertical":
-        image = Image.new("1", (width, height), 255)  # 255: clear the frame
-    else:
-        image = Image.new("1", (height, width), 255)  # 255: clear the frame
-    return image
+    return Image.new("1", (width, height), 255)  # 255: clear the frame
 
 
 def place_text(

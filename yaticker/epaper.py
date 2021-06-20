@@ -16,7 +16,8 @@ class EPaper2in7(Dashboard):
 
     def __init__(self):
         epd = epd2in7.EPD()
-        super().__init__(epd.width, epd.height, 117)
+        # EPD default orientation is vertical, we need to swap here
+        super().__init__(width=epd.height, height=epd.width, dpi=117)
         self.initialize_keys()
 
     def initialize_keys(self):

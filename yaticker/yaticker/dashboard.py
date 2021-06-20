@@ -109,7 +109,7 @@ class Dashboard(ABC):
         latest_price = data["Close"][-1]
         closing_str = f"{currency.symbol('USD')}{util.number_to_string(latest_price)}"
         stock_price_font_size = 48
-        y_offset = ((self.width - stock_price_font_size) / 2) - 12
+        y_offset = ((self.height - stock_price_font_size) / 2) - 12
         x_offset = -29
         util.place_centered_text(
             img=image,
@@ -122,7 +122,7 @@ class Dashboard(ABC):
 
         # we put the stock name at the bottom right of the graph
         symbol_font_size = 20
-        y_offset = self.width - stock_price_font_size
+        y_offset = self.height - stock_price_font_size
         util.place_text_right(
             img=image,
             text=stock.upper(),
@@ -139,7 +139,7 @@ class Dashboard(ABC):
             diff_str = f"{delta_str} ({delta_percent:+.2f}%)"
 
             diff_font_size = 10
-            y_offset = self.width - stock_price_font_size + symbol_font_size
+            y_offset = self.height - stock_price_font_size + symbol_font_size
             util.place_text_right(
                 img=image,
                 text=diff_str,
@@ -154,7 +154,7 @@ class Dashboard(ABC):
         )
 
         last_date_font_size = 10
-        y_offset = (self.width - last_date_font_size) / 2
+        y_offset = (self.height - last_date_font_size) / 2
         util.place_centered_text(
             img=image,
             text=last_data_time,
