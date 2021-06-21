@@ -32,3 +32,22 @@ Run the script using:
 ```
 python3 src/yaticker/cli.py
 ```
+
+## Configuration
+The file `config.yaml` contains a number of options that you can tweak.
+```
+# whether to cycle through the watchlist or not.
+# If set to False, will display first in list.
+# If set to True, cycles throug watchlist
+cycle: true
+# Update frequency in seconds
+updatefrequency: 5
+# Displays volume
+showvolume: false
+watchlist:
+    - AMZN
+    - FB
+    - APPL
+# How many days to display
+intervaldays: 1 
+```
