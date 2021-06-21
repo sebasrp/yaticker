@@ -1,7 +1,7 @@
 watchlist:
     - AMZN
     - FB
-    - APPL
+    - AAPL
 # whether to cycle through the watchlist or not.
 cycle: true
 # Update frequency in seconds
