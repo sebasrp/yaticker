@@ -1,0 +1,12 @@
+watchlist:
+    - AMZN
+    - FB
+    - APPL
+# whether to cycle through the watchlist or not.
+cycle: true
+# Update frequency in seconds
+updatefrequency: 5
+# Displays volume
+showvolume: false
+# How many days to display. Valid ranges: "1d","5d","1mo","3mo","6mo","1y","2y","5y","10y","ytd","max"
+period: "5d"

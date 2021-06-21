@@ -8,16 +8,23 @@ from yaticker.dashboard import Dashboard
 
 
 class EPaper2in7(Dashboard):
+    EPD = epd2in7.EPD()
+
     # PIN numbers of the physical buttons
     KEY_1 = 5
     KEY_2 = 6
     KEY_3 = 13
     KEY_4 = 19
 
-    def __init__(self):
-        epd = epd2in7.EPD()
-        # EPD default orientation is vertical, we need to swap here
-        super().__init__(width=epd.height, height=epd.width, dpi=117)
+    def __init__(
+        self,
+        width=EPD.height,
+        height=EPD.width,
+        dpi=117,
+        config_file="yaticker/config.yaml",
+    ):
+        # EPD default orientation is vertical, we swap the default height / width
+        super().__init__(width=width, height=height, dpi=dpi, config_file=config_file)
         self.initialize_keys()
 
     def initialize_keys(self):
@@ -28,7 +35,7 @@ class EPaper2in7(Dashboard):
         GPIO.setup(self.KEY_4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     def btn_1_press(self):
-        self.display_stock()
+        self.cycle_through_watchlist()
 
     def btn_2_press(self):
         self.display_message("Key 2 pressed")

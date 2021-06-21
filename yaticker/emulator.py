@@ -4,9 +4,12 @@ from yaticker.dashboard import Dashboard
 
 
 class YatickerVirtual(Dashboard):
+    """This emulates the size of the epaper 2in7, but displays the output to the console"""
 
-    def __init__(self):
-        super().__init__(width=264, height=176, dpi=117)
+    def __init__(
+        self, width=264, height=176, dpi=117, config_file="yaticker/config.yaml"
+    ):
+        super().__init__(width=width, height=height, dpi=dpi, config_file=config_file)
 
     def display_image(self, img):
         try:
@@ -20,7 +23,7 @@ def main():
     logging.basicConfig(level=logging.DEBUG)
     try:
         virtual = YatickerVirtual()
-        virtual.display_stock()
+        virtual.cycle_through_watchlist()
     except Exception as e:
         logging.error(e, exc_info=True)
 

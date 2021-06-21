@@ -41,6 +41,7 @@ setup(
         "Pillow~=8.2.0",
         "nh-currency~=1.0.1",
         "matplotlib~=3.4.2",
+        "PyYAML~=5.4.1",
     ],
     extras_require={
         "dev": ["check-manifest"],
