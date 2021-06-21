@@ -23,7 +23,7 @@ def main():
     logging.basicConfig(level=logging.DEBUG)
     try:
         virtual = YatickerVirtual()
-        virtual.cycle_through_watchlist()
+        virtual.display_settings()
     except Exception as e:
         logging.error(e, exc_info=True)
 

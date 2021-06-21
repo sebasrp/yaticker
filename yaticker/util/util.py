@@ -1,3 +1,4 @@
+import socket
 import textwrap
 from tempfile import NamedTemporaryFile
 
@@ -13,6 +14,28 @@ def is_connected(url="http://www.google.com/", timeout=3):
     except requests.ConnectionError as ex:
         print(ex)
         return False
+
+
+def get_ip():
+    """
+    Retrieve primary IP address on the local box
+    see https://stackoverflow.com/a/28950776/91468
+    :return:
+    """
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(("8.8.8.8", 1))
+        ip = s.getsockname()[0]
+    except Exception:
+        ip = "127.0.0.1"
+    finally:
+        s.close()
+    return ip
+
+
+def get_hostname():
+    return socket.gethostname()
 
 
 def number_to_string(number):

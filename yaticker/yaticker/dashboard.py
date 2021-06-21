@@ -1,3 +1,4 @@
+import inspect
 import logging
 import sched
 import time
@@ -227,6 +228,34 @@ class Dashboard(ABC):
 
         # we display the final image
         self.display_image(image)
+
+    def display_settings(self):
+        """
+        Displays the currently loaded settings but also current hostname and IP address
+        :return:
+        """
+        try:
+            font_size = 10
+            image = util.empty_image(width=self.width, height=self.height)
+            ImageDraw.Draw(image)
+            info = inspect.cleandoc(
+                f"""
+                Yaticker info
+                -----
+                hostname: {util.get_hostname()}
+                IP: {util.get_ip()}
+                -----
+                watchlist: {self.watchlist}
+                cycle: {self.cycle}
+                update frequency: {self.update_frequency}
+                show volume: {self.show_volume}
+                period: {self.period}
+            """
+            )
+            util.place_text(img=image, text=info, font_size=font_size)
+            self.display_image(image)
+        except Exception as e:
+            logging.info(f"Exception: {e}")
 
     def cycle_through_watchlist(self):
         self.display_stock(stock=next(self._watchlist_cycle), period=self.period)

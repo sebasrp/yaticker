@@ -44,7 +44,7 @@ class EPaper2in7(Dashboard):
         self.display_message("Key 3 pressed")
 
     def btn_4_press(self):
-        self.display_message("Key 4 pressed")
+        self.display_settings()
 
     def display_image(self, img):
         try:
