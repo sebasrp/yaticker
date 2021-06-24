@@ -90,7 +90,7 @@ class Dashboard(ABC):
 
     @staticmethod
     def stock_graph(
-        data, show_volume=False, height=116, width=264, dpi=117, filename="candle.png"
+        data, show_volume=False, height=128, width=264, dpi=117, filename="candle.png"
     ):
         fig_size = (width / dpi, height / dpi)
         custom_rc = {
@@ -168,25 +168,27 @@ class Dashboard(ABC):
         stock_image = Image.open(self.stock_graph(data, show_volume=self.show_volume))
         image.paste(stock_image, (0, 0))
 
+        # lets define the different text heights here so that we can do calculations easily
+        stock_price_font_size = 48
+        symbol_font_size = 20
+        diff_font_size = 10
+        last_date_font_size = 10
+
         # we draw the latest stock's price
         latest_price = data["Close"][-1]
         closing_str = f"{currency.symbol('USD')}{util.number_to_string(latest_price)}"
-        stock_price_font_size = 48
-        y_offset = ((self.height - stock_price_font_size) / 2) - 12
-        x_offset = -29
-        util.place_centered_text(
+        y_offset = self.height - (stock_price_font_size + last_date_font_size)
+        util.place_text_right(
             img=image,
             text=closing_str,
             font_size=stock_price_font_size,
-            x_offset=x_offset,
             y_offset=y_offset,
             font_name="Roboto-Medium",
         )
 
-        # we put the stock name at the bottom right of the graph
-        symbol_font_size = 20
-        y_offset = self.height - stock_price_font_size
-        util.place_text_right(
+        # we put the stock name at the bottom left of the graph
+        y_offset = self.height - ((symbol_font_size + stock_price_font_size + last_date_font_size)/2)
+        util.place_text(
             img=image,
             text=stock.upper(),
             font_size=symbol_font_size,
@@ -201,8 +203,7 @@ class Dashboard(ABC):
             delta_percent = util.get_percentage_diff(latest_price, previous_close)
             diff_str = f"{delta_str} ({delta_percent:+.2f}%)"
 
-            diff_font_size = 10
-            y_offset = self.height - stock_price_font_size + symbol_font_size
+            y_offset = self.height - diff_font_size
             util.place_text_right(
                 img=image,
                 text=diff_str,
@@ -216,9 +217,8 @@ class Dashboard(ABC):
             data.index[-1].tz_convert("Asia/Singapore").strftime("%-H:%M %p, %-d %b %Y")
         )
 
-        last_date_font_size = 10
-        y_offset = (self.height - last_date_font_size) / 2
-        util.place_centered_text(
+        y_offset = (self.height - last_date_font_size)
+        util.place_text(
             img=image,
             text=last_data_time,
             font_size=last_date_font_size,
