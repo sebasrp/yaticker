@@ -45,7 +45,7 @@ def number_to_string(number):
     :return: string representation of the number
     """
     number_string = ""
-    if number > 1000:
+    if number > 100:
         number_string = format(int(number), ",")
     else:
         number_string = str(float("%.5g" % number))
